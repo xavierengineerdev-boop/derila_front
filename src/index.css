@@ -1,0 +1,230 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Шрифты */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  --font-size-base: 16px;
+
+  /* Цвета */
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-primary: #007bff;
+  --color-secondary: #6c757d;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.5;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Мобильные устройства - до 640px */
+@media (max-width: 640px) {
+  :root {
+    --font-size-base: 14px;
+  }
+
+  .header {
+    padding: 16px 20px;
+    gap: 20px;
+  }
+
+  .logo {
+    width: 100px;
+    height: 30px;
+  }
+
+  .nav {
+    gap: 24px;
+  }
+
+  .nav-link {
+    font-size: 13px;
+  }
+
+  .main {
+    padding: 0 20px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 30px 20px;
+  }
+
+  .pod-image {
+    max-width: 400px;
+    order: 0;
+  }
+
+  .product-title h2 {
+    font-size: 28px;
+  }
+
+  .price-current {
+    font-size: 24px;
+  }
+
+  .price-old {
+    font-size: 16px;
+  }
+
+  .btn-add {
+    max-width: 100%;
+    height: 48px;
+    font-size: 14px;
+  }
+}
+
+/* Планшеты - от 641px до 1023px */
+@media (min-width: 641px) and (max-width: 1023px) {
+  :root {
+    --font-size-base: 15px;
+  }
+
+  .header {
+    padding: 18px 30px;
+    gap: 30px;
+  }
+
+  .logo {
+    width: 120px;
+    height: 35px;
+  }
+
+  .nav {
+    gap: 35px;
+  }
+
+  .nav-link {
+    font-size: 14px;
+  }
+
+  .main {
+    padding: 0 30px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 40px 30px;
+  }
+
+  .pod-image {
+    max-width: 450px;
+  }
+
+  .product-title h2 {
+    font-size: 36px;
+  }
+
+  .price-current {
+    font-size: 28px;
+  }
+
+  .price-old {
+    font-size: 18px;
+  }
+
+  .btn-add {
+    max-width: 260px;
+    height: 50px;
+    font-size: 15px;
+  }
+}
+
+/* Планшеты большие - от 1024px до 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 35px;
+    padding: 50px 35px;
+  }
+
+  .pod-image {
+    max-width: 550px;
+  }
+
+  .product-title h2 {
+    font-size: 42px;
+  }
+
+  .price-current {
+    font-size: 32px;
+  }
+
+  .price-old {
+    font-size: 20px;
+  }
+
+  .btn-add {
+    max-width: 270px;
+    height: 52px;
+    font-size: 16px;
+  }
+}
+
+/* Десктоп - от 1440px и выше */
+@media (min-width: 1440px) {
+  .header {
+    padding: 20px 76px;
+  }
+
+  .logo {
+    width: 144px;
+    height: 41px;
+  }
+
+  .nav {
+    gap: 80px;
+  }
+
+  .main {
+    padding: 0 76px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 60px 40px;
+  }
+
+  .pod-image {
+    max-width: 600px;
+  }
+
+  .product-title h2 {
+    font-size: 48px;
+  }
+
+  .price-current {
+    font-size: 36px;
+  }
+
+  .price-old {
+    font-size: 20px;
+  }
+
+  .btn-add {
+    max-width: 280px;
+  }
+}
