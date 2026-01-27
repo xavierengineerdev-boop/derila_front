@@ -1,4 +1,3 @@
-// API Configuration
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 export const apiClient = {
@@ -9,7 +8,6 @@ export const apiClient = {
       ...options.headers,
     }
 
-    // Add JWT token if available
     const token = localStorage.getItem('auth_token')
     if (token) {
       headers['Authorization'] = `Bearer ${token}`

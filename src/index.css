@@ -5,13 +5,11 @@
 }
 
 :root {
-  /* Шрифты */
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   --font-size-base: 16px;
 
-  /* Цвета */
   --color-bg: #ffffff;
   --color-text: #000000;
   --color-primary: #007bff;
@@ -37,7 +35,6 @@ body {
   height: 100%;
 }
 
-/* Мобильные устройства - до 640px */
 @media (max-width: 640px) {
   :root {
     --font-size-base: 14px;
@@ -95,7 +92,6 @@ body {
   }
 }
 
-/* Планшеты - от 641px до 1023px */
 @media (min-width: 641px) and (max-width: 1023px) {
   :root {
     --font-size-base: 15px;
@@ -152,7 +148,6 @@ body {
   }
 }
 
-/* Планшеты большие - от 1024px до 1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .hero {
     grid-template-columns: 1fr 1fr;
@@ -183,7 +178,6 @@ body {
   }
 }
 
-/* Десктоп - от 1440px и выше */
 @media (min-width: 1440px) {
   .header {
     padding: 20px 76px;

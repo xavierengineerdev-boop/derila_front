@@ -1,6 +1,3 @@
-// Пример интеграции бекенда в App.jsx
-// Добавьте это в начало файла App.jsx:
-
 import { useState, useEffect } from 'react'
 import { useProducts, useCart, useAuth, useOrder } from './hooks/useApi'
 import './App.css'
@@ -11,13 +8,11 @@ function App() {
   const [showCart, setShowCart] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
   
-  // API Hooks
   const { products, loading: productsLoading } = useProducts()
   const { cart, addToCart, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart()
   const { user, login, logout } = useAuth()
   const { createOrder, loading: orderLoading } = useOrder()
 
-  // Существующий код для resize listener
   useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth)
@@ -27,7 +22,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // FAQ items (оставить как есть)
   const faqItems = [
     {
       id: 1,
@@ -55,7 +49,6 @@ function App() {
     setExpandedFAQ(expandedFAQ === id ? null : id)
   }
 
-  // Обработчик добавления в корзину
   const handleAddToCart = (product, quantity = 1) => {
     addToCart({
       id: product._id || product.id,
@@ -67,7 +60,6 @@ function App() {
     alert(`${product.name} добавлен в корзину!`)
   }
 
-  // Обработчик оформления заказа
   const handleCheckout = async () => {
     if (!user) {
       alert('Пожалуйста, войдите в систему')
@@ -115,7 +107,6 @@ function App() {
           <a href="#" className="nav-link">Контакты</a>
         </nav>
         
-        {/* Кнопка корзины и профиля */}
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
             onClick={() => setShowCart(!showCart)}
@@ -163,7 +154,6 @@ function App() {
         </div>
       </header>
 
-      {/* Модал корзины */}
       {showCart && (
         <div style={{
           position: 'fixed',
@@ -243,10 +233,6 @@ function App() {
         </div>
       )}
 
-      {/* Основной контент - добавьте свой существующий JSX здесь */}
-      {/* ... ваш существующий код для hero, features, reviews и т.д. ... */}
-
-      {/* Пример отображения товаров из API */}
       {productsLoading && <div style={{ padding: '20px' }}>Загрузка товаров...</div>}
       
       {!productsLoading && products.length > 0 && (
@@ -283,8 +269,6 @@ function App() {
           </div>
         </section>
       )}
-
-      {/* Оставьте весь остальной существующий JSX вашего App.jsx ... */}
     </div>
   )
 }

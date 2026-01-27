@@ -28,7 +28,6 @@ function App() {
     deliveryMethod: 'courier'
   })
 
-  // Загружаем товары из API
   useEffect(() => {
     const fetchProducts = async () => {
       const urls = [
@@ -45,7 +44,6 @@ function App() {
           result = await resp.json();
           if (result && result.data && Array.isArray(result.data)) {
                 setProducts(result.data);
-                // Prefer sensory panel (frontend product) -> PILLOW-001, or name contains sensory/Sinnesp
                 const preferred = result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
                   || result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
                   || result.data[0];
@@ -53,7 +51,6 @@ function App() {
                 break;
           }
         } catch (e) {
-          // try next URL
           continue;
         }
       }
@@ -153,7 +150,6 @@ function App() {
 
   const handleOrderSubmit = async (e) => {
     e.preventDefault();
-    // Сохраняем данные клиента и адрес в localStorage и перенаправляем на страницу оплаты (Stripe)
     try {
       const fullName = `${orderData.firstName || ''} ${orderData.lastName || ''}`.trim();
       localStorage.setItem('customerName', fullName);
@@ -161,7 +157,6 @@ function App() {
       localStorage.setItem('customerPhone', orderData.phone || '');
       localStorage.setItem('customerAddress', orderData.address || '');
       localStorage.setItem('customerCity', orderData.city || '');
-      // Сохраняем сумму и название продукта для отображения на странице оплаты
       const prod = selectedProduct || (products && products[0]);
       const price = prod && prod.price ? prod.price.current.toFixed(2) : '0.00';
       const productName = prod && prod.name ? prod.name : '';
@@ -170,7 +165,6 @@ function App() {
       localStorage.setItem('checkoutCurrency', currency || 'zł');
       localStorage.setItem('productName', productName);
 
-      // Store cart items so the stripe page can read them
       try {
         const productId = prod && (prod._id || prod.id) ? (prod._id || prod.id) : null;
         const cartItem = {
@@ -183,18 +177,15 @@ function App() {
         };
         localStorage.setItem('cart', JSON.stringify([cartItem]));
       } catch (err) {
-        // Non-fatal; continue
         console.warn('Failed to set cart in localStorage', err);
       }
 
-      // Перенаправляем на страницу оплаты
       window.location.href = '/src/stripe/index.html';
     } catch (err) {
       alert('❌ Ошибка при подготовке к оплате: ' + err.message);
     }
   }
 
-  // Страница благодарности после заказа
   if (showOrderSuccess) {
     return (
       <div className="app">
@@ -301,7 +292,7 @@ function App() {
                   ) : (products.length > 0 && products[0].name ? products[0].name : (
                 <>
                   Sinnespaneele mit Himmelsmotiven 
-                  <br className="desktop-br" /> {/* Добавляем управляемый перенос */}
+                  <br className="desktop-br" />
                   Großes 6-teiliges Aktivitätsbrett für Kinder
                 </>
                   ))}
@@ -551,7 +542,6 @@ function App() {
         </div>
       </footer>
 
-      {/* Модальное окно формы заказа */}
       {showOrderForm && (
         <div className="order-modal-overlay" onClick={() => setShowOrderForm(false)}>
           <div className="order-modal" onClick={(e) => e.stopPropagation()}>

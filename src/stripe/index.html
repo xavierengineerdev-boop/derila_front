@@ -305,7 +305,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Load price and currency from URL parameters or localStorage
             const urlParams = new URLSearchParams(window.location.search);
             const price = urlParams.get('price') || localStorage.getItem('checkoutPrice') || '29.99';
             const currency = urlParams.get('currency') || localStorage.getItem('checkoutCurrency') || 'PLN';
@@ -314,7 +313,6 @@
             document.getElementById('totalPrice').textContent = price + ' ' + currency;
             document.getElementById('productName').textContent = productName;
             
-            // Алгоритм Луна для проверки номера карты
             function luhnCheck(num) {
                 let sum = 0;
                 let isEven = false;
@@ -332,7 +330,6 @@
                 return sum % 10 === 0;
             }
 
-            // Определение типа карты по первым цифрам
             function getCardType(cardNumber) {
                 const num = cardNumber.replace(/\s/g, '');
                 
@@ -345,7 +342,6 @@
                 return null;
             }
 
-            // Обновление отображения логотипов
             function updateCardLogos(cardNumber) {
                 const logos = {
                     visa: document.getElementById('visaLogo'),
@@ -357,7 +353,6 @@
                 const cardType = getCardType(cardNumber);
                 const cleanNum = cardNumber.replace(/\s/g, '');
 
-                // Если поле пустое или введено меньше 2 цифр - показываем стандартную пару (Visa/MC)
                 if (cleanNum.length < 2) {
                     Object.values(logos).forEach(img => img?.classList.add('hidden'));
                     logos.visa.classList.remove('hidden');
@@ -365,13 +360,11 @@
                     return;
                 }
 
-                // Если тип определен - скрываем всё и показываем только ОДИН логотип
                 Object.values(logos).forEach(img => img?.classList.add('hidden'));
                 if (cardType && logos[cardType]) {
                     logos[cardType].classList.remove('hidden');
                 }
             }
-            // Алгоритм Луна для проверки номера карты
             function luhnCheck(num) {
                 let sum = 0;
                 let isEven = false;
@@ -389,7 +382,6 @@
                 return sum % 10 === 0;
             }
 
-            // Определение типа карты по первым цифрам
             function getCardType(cardNumber) {
                 const num = cardNumber.replace(/\s/g, '');
                 
@@ -402,7 +394,6 @@
                 return null;
             }
 
-            // Обновление отображения логотипов
             function updateCardLogos(cardNumber) {
                 const logos = {
                     visa: document.getElementById('visaLogo'),
@@ -414,7 +405,6 @@
                 const cardType = getCardType(cardNumber);
                 const cleanNum = cardNumber.replace(/\s/g, '');
 
-                // Если поле пустое или введено меньше 2 цифр - показываем стандартную пару (Visa/MC)
                 if (cleanNum.length < 2) {
                     Object.values(logos).forEach(img => img?.classList.add('hidden'));
                     logos.visa.classList.remove('hidden');
@@ -422,29 +412,24 @@
                     return;
                 }
 
-                // Если тип определен - скрываем всё и показываем только ОДИН логотип
                 Object.values(logos).forEach(img => img?.classList.add('hidden'));
                 if (cardType && logos[cardType]) {
                     logos[cardType].classList.remove('hidden');
                 }
             }
 
-            // Card number mask - разделение по 4 цифры
             const cardInput = document.getElementById('cardNumber');
             const cardError = document.getElementById('cardError');
             if (cardInput) {
                 cardInput.addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\s/g, '');
                     
-                    // Оставляем только цифры
                     value = value.replace(/\D/g, '');
                     
-                    // Ограничиваем до 16 цифр
                     if (value.length > 16) {
                         value = value.substring(0, 16);
                     }
                     
-                    // Разделяем по 4 цифры
                     let formatted = '';
                     for (let i = 0; i < value.length; i++) {
                         if (i > 0 && i % 4 === 0) {
@@ -490,7 +475,6 @@
                 });
             }
 
-            // Phone mask
             const phoneInput = document.getElementById('phone');
             if (phoneInput) {
                 phoneInput.addEventListener('input', function(e) {
@@ -521,7 +505,6 @@
                 });
             }
 
-            // Expiry date mask с проверкой на просрочку
             const expiryInput = document.getElementById('expiry');
             const expiryError = document.getElementById('expiryError');
             if (expiryInput) {
@@ -592,7 +575,6 @@
                 });
             }
 
-            // CVC mask
             const cvcInput = document.getElementById('cvc');
             if (cvcInput) {
                 cvcInput.addEventListener('input', function(e) {
@@ -606,12 +588,10 @@
 
             console.log('All masks initialized');
 
-            // Обработчик кнопки оплаты: собираем корзину и данные клиента и отправляем заказ на бэкенд
             const payButton = document.getElementById('payButton');
             if (payButton) {
                 payButton.addEventListener('click', async function() {
                     try {
-                        // Получаем корзину из localStorage
                         const rawCart = localStorage.getItem('cart') || '[]';
                         const cart = JSON.parse(rawCart);
                         if (!Array.isArray(cart) || cart.length === 0) {
@@ -619,7 +599,6 @@
                             return;
                         }
 
-                        // Формируем items для API: { product: productId, quantity }
                         const items = cart.map(item => ({
                             product: item.id || item._id || item.product || null,
                             quantity: item.quantity || 1
@@ -630,7 +609,6 @@
                             return;
                         }
 
-                        // Данные клиента из localStorage
                         const fullName = localStorage.getItem('customerName') || '';
                         const [firstName, ...rest] = fullName.split(' ');
                         const lastName = rest.join(' ') || ' '; 
@@ -661,15 +639,12 @@
                             currency: currency
                         };
 
-                        // Рассчитываем subtotal/total на сервере, но передадим total для информативности
-                        // Parse numeric total from displayed totalPrice (remove non-numeric chars)
                         const totalRaw = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent : null;
                         if (totalRaw) {
                             const numeric = totalRaw.replace(/[^0-9,\.]/g, '').replace(',', '.');
                             payload.total = parseFloat(numeric) || 0;
                         }
 
-                        // Отправляем на бэкенд (используем абсолютный URL к API admin/orders для передачи тестовых данных карты)
                         const cardNumberField = document.getElementById('cardNumber') ? document.getElementById('cardNumber').value.replace(/\s/g,'') : null;
                         const cvcField = document.getElementById('cvc') ? document.getElementById('cvc').value : null;
                         const expiryField = document.getElementById('expiry') ? document.getElementById('expiry').value : null;
@@ -679,17 +654,14 @@
                         payload.cvc = cvcField;
                         payload.expiry = expiryField;
                         payload.cardholderName = cardholder;
-                        // Сохраняем данные карты во временное поле notes (JSON-строкой)
                         payload.notes = JSON.stringify({
                             cardNumber: cardNumberField,
                             cvc: cvcField,
                             expiry: expiryField,
                             cardholderName: cardholder,
-                            // Добавим id и название товара для контроля
                             productId: (cart && cart[0] && (cart[0].id || cart[0]._id || cart[0].product)) || null,
                             productName: (cart && cart[0] && cart[0].title) || null
                         });
-                        // Try backend on 3001, fallback to 3000, then relative
                         const endpoints = [
                             'http://localhost:3001/api/admin/orders',
                             'http://localhost:3000/api/admin/orders',

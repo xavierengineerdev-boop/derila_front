@@ -1,7 +1,6 @@
 import { apiClient } from './config.js'
 
 export const productService = {
-  // Get all products
   async getProducts(query = '') {
     try {
       const endpoint = query ? `/products?search=${query}` : '/products'
@@ -11,7 +10,6 @@ export const productService = {
     }
   },
 
-  // Get single product
   async getProduct(id) {
     try {
       return await apiClient.get(`/products/${id}`)
@@ -20,7 +18,6 @@ export const productService = {
     }
   },
 
-  // Create product (admin)
   async createProduct(productData) {
     try {
       return await apiClient.post('/products', productData)
@@ -29,7 +26,6 @@ export const productService = {
     }
   },
 
-  // Update product (admin)
   async updateProduct(id, productData) {
     try {
       return await apiClient.put(`/products/${id}`, productData)
@@ -38,7 +34,6 @@ export const productService = {
     }
   },
 
-  // Delete product (admin)
   async deleteProduct(id) {
     try {
       return await apiClient.delete(`/products/${id}`)
@@ -49,7 +44,6 @@ export const productService = {
 }
 
 export const orderService = {
-  // Create order
   async createOrder(orderData) {
     try {
       return await apiClient.post('/orders', orderData)
@@ -58,7 +52,6 @@ export const orderService = {
     }
   },
 
-  // Get orders
   async getOrders() {
     try {
       return await apiClient.get('/orders')
@@ -67,7 +60,6 @@ export const orderService = {
     }
   },
 
-  // Get order by ID
   async getOrder(id) {
     try {
       return await apiClient.get(`/orders/${id}`)
@@ -78,7 +70,6 @@ export const orderService = {
 }
 
 export const authService = {
-  // Register user
   async register(userData) {
     try {
       const response = await apiClient.post('/auth/register', userData)
@@ -91,7 +82,6 @@ export const authService = {
     }
   },
 
-  // Login user
   async login(credentials) {
     try {
       const response = await apiClient.post('/auth/login', credentials)
@@ -104,12 +94,10 @@ export const authService = {
     }
   },
 
-  // Logout user
   logout() {
     localStorage.removeItem('auth_token')
   },
 
-  // Get current user
   async getCurrentUser() {
     try {
       return await apiClient.get('/auth/me')
@@ -121,7 +109,6 @@ export const authService = {
 }
 
 export const cartService = {
-  // Add to cart (local storage)
   addToCart(product) {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]')
     const existingItem = cart.find(item => item.id === product.id)
@@ -136,12 +123,10 @@ export const cartService = {
     return cart
   },
 
-  // Get cart
   getCart() {
     return JSON.parse(localStorage.getItem('cart') || '[]')
   },
 
-  // Remove from cart
   removeFromCart(productId) {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]')
     const filtered = cart.filter(item => item.id !== productId)
@@ -149,13 +134,11 @@ export const cartService = {
     return filtered
   },
 
-  // Clear cart
   clearCart() {
     localStorage.removeItem('cart')
     return []
   },
 
-  // Update cart item quantity
   updateQuantity(productId, quantity) {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]')
     const item = cart.find(item => item.id === productId)
