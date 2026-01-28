@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import { productService } from './api/services.js'
 
 function App() {
   const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440)
@@ -30,36 +31,23 @@ function App() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const urls = [
-        'http://localhost:3001/api/products',
-        'http://localhost:3000/api/products',
-        '/api/products'
-      ];
-
-      let result = null;
-      for (const url of urls) {
-        try {
-          const resp = await fetch(url, { cache: 'no-store' });
-          if (!resp.ok) continue;
-          result = await resp.json();
-          if (result && result.data && Array.isArray(result.data)) {
-                setProducts(result.data);
-                const preferred = result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
-                  || result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
-                  || result.data[0];
-                setSelectedProduct(preferred);
-                break;
-          }
-        } catch (e) {
-          continue;
+      try {
+        const result = await productService.getProducts();
+        if (result && result.data && Array.isArray(result.data)) {
+          setProducts(result.data);
+          const preferred = result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
+            || result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
+            || result.data[0];
+          setSelectedProduct(preferred);
+        } else {
+          setError('No products found in response');
         }
+      } catch (err) {
+        console.error('Failed to load products:', err);
+        setError('Failed to load products from backend. Please check your API configuration.');
+      } finally {
+        setLoading(false);
       }
-
-      if (!result) {
-        setError('Failed to load products from backend (tried ports 3001 and 3000).');
-      }
-
-      setLoading(false);
     }
 
     fetchProducts()
