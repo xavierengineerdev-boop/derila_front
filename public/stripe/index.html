@@ -400,8 +400,23 @@
 
             const payButton = document.getElementById('payButton');
             if (payButton) {
+                let isProcessing = false; // Флаг для предотвращения дублей
+                
                 payButton.addEventListener('click', async function() {
-                    // Валидация полей формы
+                    // Защита от повторных кликов
+                    if (isProcessing) {
+                        console.warn('⚠️ Заказ уже обрабатывается, игнорируем повторный клик');
+                        return;
+                    }
+                    
+                    isProcessing = true;
+                    payButton.disabled = true;
+                    payButton.textContent = 'Обработка...';
+                    payButton.style.opacity = '0.6';
+                    payButton.style.cursor = 'not-allowed';
+                    
+                    try {
+                        // Валидация полей формы
                     const emailField = document.getElementById('email');
                     const phoneField = document.getElementById('phone');
                     const cardNumberField = document.getElementById('cardNumber');
@@ -634,6 +649,13 @@
                                 console.log('Переход на страницу благодарности:', thankYouPath);
                                 window.location.href = thankYouPath;
                             } else {
+                                // Восстанавливаем состояние кнопки при ошибке
+                                isProcessing = false;
+                                payButton.disabled = false;
+                                payButton.textContent = 'Pay';
+                                payButton.style.opacity = '1';
+                                payButton.style.cursor = 'pointer';
+                                
                                 const errorText = await resp.text();
                                 console.error('❌ Ошибка при создании заказа:', {
                                     status: resp.status,
@@ -651,15 +673,37 @@
                                     } else if (errorText.includes('405')) {
                                         errorMessage = '405 Not Allowed - метод POST не разрешен для этого endpoint';
                                     }
+                                } else {
+                                    // Пытаемся распарсить JSON ошибку
+                                    try {
+                                        const errorJson = JSON.parse(errorText);
+                                        errorMessage = errorJson.message || errorJson.error || errorText;
+                                    } catch (e) {
+                                        // Оставляем errorText как есть
+                                    }
                                 }
                                 
                                 alert('Ошибка при создании заказа: ' + errorMessage + '\n\nПроверьте консоль для подробностей.');
                             }
                         } catch (e) {
+                            // Восстанавливаем состояние кнопки при ошибке
+                            isProcessing = false;
+                            payButton.disabled = false;
+                            payButton.textContent = 'Pay';
+                            payButton.style.opacity = '1';
+                            payButton.style.cursor = 'pointer';
+                            
                             console.error('Ошибка при отправке заказа:', e);
                             alert('Ошибка при оплате: ' + (e.message || 'Не удалось связаться с сервером'));
                         }
                     } catch (e) {
+                        // Восстанавливаем состояние кнопки при ошибке
+                        isProcessing = false;
+                        payButton.disabled = false;
+                        payButton.textContent = 'Pay';
+                        payButton.style.opacity = '1';
+                        payButton.style.cursor = 'pointer';
+                        
                         console.error(e);
                         alert('Ошибка при оплате: ' + e.message);
                     }

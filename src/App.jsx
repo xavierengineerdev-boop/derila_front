@@ -126,17 +126,47 @@ function App() {
   }
 
   const handleBuyClick = () => {
-    if (products.length === 0) return;
+    if (products.length === 0) {
+      console.warn('⚠️ Нет продуктов для заказа');
+      return;
+    }
+    
     const prod = selectedProduct || (products && products[0]);
+    if (!prod) {
+      console.error('❌ Не удалось определить продукт для заказа');
+      return;
+    }
+    
+    // Извлекаем актуальный ID продукта из загруженных данных
+    let productId = null;
+    if (prod._id) {
+      productId = typeof prod._id === 'object' && prod._id.toString ? prod._id.toString() : prod._id;
+    } else if (prod.id) {
+      productId = typeof prod.id === 'object' && prod.id.toString ? prod.id.toString() : prod.id;
+    }
+    
+    if (!productId) {
+      console.error('❌ Не удалось извлечь ID продукта:', prod);
+      alert('Ошибка: не удалось определить ID товара. Пожалуйста, обновите страницу.');
+      return;
+    }
+    
+    productId = String(productId).trim();
+    console.log('✅ Выбран продукт для заказа:', {
+      name: prod.name,
+      id: productId,
+      price: prod.price?.current
+    });
+    
     setOrderData(prev => ({
       ...prev,
       quantity: quantity,
-      productId: prod?._id,
+      productId: productId,
       productName: prod?.name,
       totalPrice: prod?.price?.current * quantity
     }));
+    
     try {
-      const productId = prod && (prod._id || prod.id) ? (prod._id || prod.id) : null;
       const cartItem = {
         product: productId,
         id: productId,
@@ -149,8 +179,9 @@ function App() {
       localStorage.setItem('checkoutPrice', (prod?.price?.current * quantity).toFixed(2));
       localStorage.setItem('checkoutCurrency', (prod?.price?.currency || 'zł'));
       localStorage.setItem('productName', prod?.name || '');
+      console.log('✅ Корзина сохранена с актуальным ID:', productId);
     } catch (err) {
-      console.warn('Failed to prefill cart in localStorage', err);
+      console.error('❌ Ошибка при сохранении корзины:', err);
     }
     setShowOrderForm(true);
   }
