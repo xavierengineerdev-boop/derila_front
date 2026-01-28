@@ -456,13 +456,52 @@
                             return;
                         }
 
-                        const items = cart.map(item => ({
-                            product: item.id || item._id || item.product || null,
-                            quantity: item.quantity || 1
-                        })).filter(i => i.product);
+                        console.log('Обработка корзины для создания items:');
+                        console.log('Cart:', cart);
+                        
+                        const items = cart.map((item, index) => {
+                            // Извлекаем product ID - может быть объектом или строкой
+                            let productId = item.id || item._id || item.product || null;
+                            
+                            // Если это объект, преобразуем в строку
+                            if (productId && typeof productId === 'object') {
+                                productId = productId.toString ? productId.toString() : String(productId);
+                            }
+                            
+                            // Убеждаемся, что это строка
+                            if (productId) {
+                                productId = String(productId).trim();
+                            }
+                            
+                            console.log(`Cart item ${index}:`, {
+                                rawId: item.id,
+                                raw_id: item._id,
+                                rawProduct: item.product,
+                                processedProductId: productId,
+                                productIdType: typeof productId,
+                                quantity: item.quantity
+                            });
+                            
+                            return {
+                                product: productId,
+                                quantity: item.quantity || 1
+                            };
+                        }).filter(i => {
+                            const isValid = i.product !== null && i.product !== undefined && i.product !== '' && i.product.trim() !== '';
+                            if (!isValid) {
+                                console.warn('❌ Отфильтрован item с невалидным product ID:', i);
+                            } else {
+                                console.log('✅ Валидный item:', i);
+                            }
+                            return isValid;
+                        });
+
+                        console.log('Сформированные items для отправки:', items);
 
                         if (items.length === 0) {
-                            alert('Неверные данные в корзине');
+                            console.error('❌ Нет валидных items для отправки');
+                            console.error('Cart был:', cart);
+                            alert('Неверные данные в корзине. Проверьте консоль для подробностей.');
                             return;
                         }
 

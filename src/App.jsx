@@ -34,11 +34,30 @@ function App() {
       try {
         const result = await productService.getProducts();
         if (result && result.data && Array.isArray(result.data)) {
+          console.log('✅ Продукты загружены:', result.data.length, 'шт');
+          // Логируем ID первого продукта для отладки
+          if (result.data.length > 0) {
+            const firstProduct = result.data[0];
+            console.log('Первый продукт:', {
+              name: firstProduct.name,
+              _id: firstProduct._id,
+              id: firstProduct.id,
+              _idType: typeof firstProduct._id,
+              idType: typeof firstProduct.id
+            });
+          }
           setProducts(result.data);
           const preferred = result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
             || result.data.find(p => p.sku === 'PILLOW-001' || /derila/i.test(p.name))
             || result.data[0];
           setSelectedProduct(preferred);
+          if (preferred) {
+            console.log('Выбранный продукт:', {
+              name: preferred.name,
+              _id: preferred._id,
+              id: preferred.id
+            });
+          }
         } else {
           setError('No products found in response');
         }
@@ -205,7 +224,30 @@ function App() {
       });
 
       try {
-        const productId = prod && (prod._id || prod.id) ? (prod._id || prod.id) : null;
+        // Извлекаем ID продукта - может быть объектом или строкой
+        let productId = null;
+        if (prod) {
+          if (prod._id) {
+            // Если _id это объект (например, MongoDB ObjectId), преобразуем в строку
+            productId = typeof prod._id === 'object' && prod._id.toString ? prod._id.toString() : prod._id;
+          } else if (prod.id) {
+            productId = typeof prod.id === 'object' && prod.id.toString ? prod.id.toString() : prod.id;
+          }
+        }
+        
+        if (!productId) {
+          console.error('❌ Ошибка: product ID не найден!');
+          console.error('Product object:', prod);
+          console.error('prod._id:', prod?._id);
+          console.error('prod.id:', prod?.id);
+          alert('Ошибка: не удалось определить ID товара. Пожалуйста, обновите страницу.');
+          return;
+        }
+        
+        // Убеждаемся, что ID - строка
+        productId = String(productId);
+        console.log('✅ Product ID для сохранения:', productId, '(тип:', typeof productId + ')');
+        
         const cartItem = {
           product: productId,
           id: productId,
@@ -216,7 +258,7 @@ function App() {
           total: parseFloat(totalPrice) // Общая цена (цена * количество)
         };
         localStorage.setItem('cart', JSON.stringify([cartItem]));
-        console.log('Корзина сохранена:', cartItem);
+        console.log('✅ Корзина сохранена:', cartItem);
       } catch (err) {
         console.error('Failed to set cart in localStorage', err);
         alert('Ошибка при сохранении корзины: ' + err.message);
