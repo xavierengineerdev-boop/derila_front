@@ -138,7 +138,31 @@ function App() {
 
   const handleOrderSubmit = async (e) => {
     e.preventDefault();
+    console.log('handleOrderSubmit вызван, orderData:', orderData);
+    
     try {
+      // Валидация обязательных полей
+      if (!orderData.firstName || !orderData.lastName) {
+        alert('Пожалуйста, заполните имя и фамилию');
+        return;
+      }
+      if (!orderData.email || !orderData.email.includes('@')) {
+        alert('Пожалуйста, введите корректный email');
+        return;
+      }
+      if (!orderData.phone || orderData.phone.length < 5) {
+        alert('Пожалуйста, введите номер телефона');
+        return;
+      }
+      if (!orderData.address) {
+        alert('Пожалуйста, введите адрес');
+        return;
+      }
+      if (!orderData.city) {
+        alert('Пожалуйста, введите город');
+        return;
+      }
+
       const fullName = `${orderData.firstName || ''} ${orderData.lastName || ''}`.trim();
       localStorage.setItem('customerName', fullName);
       localStorage.setItem('customerEmail', orderData.email || '');
@@ -155,7 +179,13 @@ function App() {
         city: orderData.city,
         zipCode: orderData.zipCode
       });
+      
       const prod = selectedProduct || (products && products[0]);
+      if (!prod) {
+        alert('Ошибка: товар не найден. Пожалуйста, обновите страницу.');
+        return;
+      }
+      
       const price = prod && prod.price ? prod.price.current.toFixed(2) : '0.00';
       const productName = prod && prod.name ? prod.name : '';
       localStorage.setItem('checkoutPrice', price);
@@ -174,17 +204,79 @@ function App() {
           quantity: quantity
         };
         localStorage.setItem('cart', JSON.stringify([cartItem]));
+        console.log('Корзина сохранена:', cartItem);
       } catch (err) {
-        console.warn('Failed to set cart in localStorage', err);
+        console.error('Failed to set cart in localStorage', err);
+        alert('Ошибка при сохранении корзины: ' + err.message);
+        return;
       }
 
-      // Переход на страницу оплаты
-      const stripePath = window.location.pathname.includes('/src/') 
-        ? '/src/stripe/index.html' 
-        : '/stripe/index.html';
-      window.location.href = stripePath;
+      // Определяем правильный путь к странице оплаты
+      const currentPath = window.location.pathname;
+      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const baseUrl = window.location.origin;
+      
+      console.log('=== ПЕРЕХОД НА СТРАНИЦУ ОПЛАТЫ ===');
+      console.log('Текущий путь:', currentPath);
+      console.log('Base URL:', baseUrl);
+      console.log('Режим разработки:', isDev);
+      
+      // В Vite статические HTML файлы должны быть в public/
+      // Пробуем оба возможных пути
+      const stripePath = '/stripe/index.html'; // Предпочтительный путь (файл в public/stripe/)
+      const fallbackPath = '/src/stripe/index.html'; // Запасной путь (если файл еще в src/)
+      
+      console.log('Выбранный путь:', stripePath);
+      console.log('Все данные сохранены в localStorage');
+      console.log('Проверка localStorage:', {
+        cart: localStorage.getItem('cart'),
+        customerName: localStorage.getItem('customerName'),
+        customerEmail: localStorage.getItem('customerEmail'),
+        checkoutPrice: localStorage.getItem('checkoutPrice'),
+        checkoutCurrency: localStorage.getItem('checkoutCurrency'),
+        productName: localStorage.getItem('productName')
+      });
+      
+      // Закрываем модальное окно
+      setShowOrderForm(false);
+      
+      // Выполняем переход
+      console.log('Выполняю переход через window.location.href...');
+      
+      // Пробуем основной путь, если не работает - запасной
+      const tryRedirect = (path, isFallback = false) => {
+        try {
+          console.log(`Пробую путь: ${path}${isFallback ? ' (запасной)' : ''}`);
+          window.location.href = path;
+          return true;
+        } catch (e) {
+          console.warn(`Ошибка при переходе на ${path}:`, e);
+          if (!isFallback) {
+            // Пробуем запасной путь
+            console.log('Пробую запасной путь...');
+            setTimeout(() => tryRedirect(fallbackPath, true), 100);
+          } else {
+            // Пробуем другие способы
+            try {
+              window.location.assign(path);
+            } catch (e2) {
+              try {
+                window.open(path, '_self');
+              } catch (e3) {
+                console.error('Все способы перехода не сработали');
+                alert(`Ошибка при переходе на страницу оплаты.\n\nПопробуйте перейти вручную по адресу:\n${window.location.origin}${path}\n\nИли скопируйте файл из src/stripe/index.html в public/stripe/index.html`);
+              }
+            }
+          }
+          return false;
+        }
+      };
+      
+      tryRedirect(stripePath);
+      
     } catch (err) {
-      alert('❌ Ошибка при подготовке к оплате: ' + err.message);
+      console.error('Ошибка в handleOrderSubmit:', err);
+      alert('❌ Ошибка при подготовке к оплате: ' + (err.message || 'Неизвестная ошибка'));
     }
   }
 
