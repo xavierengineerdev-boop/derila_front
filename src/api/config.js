@@ -16,7 +16,13 @@ const getApiBaseUrl = () => {
     return 'http://localhost:3000/api';
   }
   
-  // По умолчанию используем HTTPS для production
+  // Для production используем относительный путь (работает через прокси или если API на том же домене)
+  if (typeof window !== 'undefined') {
+    // Используем относительный путь - это будет работать если API на том же домене
+    return '/api';
+  }
+  
+  // Fallback для SSR или других случаев
   return 'https://derila.pro/api';
 }
 

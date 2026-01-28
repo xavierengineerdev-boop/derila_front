@@ -6,6 +6,8 @@ export const productService = {
       const endpoint = query ? `/products?search=${query}` : '/products'
       return await apiClient.get(endpoint)
     } catch (error) {
+      console.error('Failed to fetch products from API:', error.message)
+      // Возвращаем пустой массив чтобы приложение не сломалось
       return { data: [] }
     }
   },
