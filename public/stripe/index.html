@@ -129,12 +129,33 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const price = urlParams.get('price') || localStorage.getItem('checkoutPrice') || '29.99';
+            // Берем цену из localStorage (уже с учетом количества)
+            let price = urlParams.get('price') || localStorage.getItem('checkoutPrice') || '29.99';
             const currency = urlParams.get('currency') || localStorage.getItem('checkoutCurrency') || 'PLN';
             const productName = urlParams.get('product') || localStorage.getItem('productName') || 'Toy order';
 
+            // Если цена не найдена, пытаемся рассчитать из корзины
+            if (!price || price === '29.99') {
+                try {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    if (cart.length > 0 && cart[0]) {
+                        const item = cart[0];
+                        // Если есть total, используем его, иначе считаем price * quantity
+                        if (item.total) {
+                            price = item.total.toFixed(2);
+                        } else if (item.price && item.quantity) {
+                            price = (item.price * item.quantity).toFixed(2);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Не удалось рассчитать цену из корзины:', e);
+                }
+            }
+
             document.getElementById('totalPrice').textContent = price + ' ' + currency;
             document.getElementById('productName').textContent = productName;
+            
+            console.log('Цена на странице оплаты:', price, currency);
             
             // Загружаем сохраненные данные клиента в форму
             const savedEmail = localStorage.getItem('customerEmail') || '';

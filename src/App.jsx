@@ -186,12 +186,23 @@ function App() {
         return;
       }
       
-      const price = prod && prod.price ? prod.price.current.toFixed(2) : '0.00';
+      // Рассчитываем общую цену с учетом количества
+      const unitPrice = prod && prod.price ? prod.price.current : 0;
+      const totalPrice = (unitPrice * quantity).toFixed(2);
       const productName = prod && prod.name ? prod.name : '';
-      localStorage.setItem('checkoutPrice', price);
+      
+      // Сохраняем общую цену (цена за единицу * количество)
+      localStorage.setItem('checkoutPrice', totalPrice);
       const currency = prod && prod.price ? prod.price.currency : 'zł';
       localStorage.setItem('checkoutCurrency', currency || 'zł');
       localStorage.setItem('productName', productName);
+      
+      console.log('Цена сохранена:', {
+        unitPrice: unitPrice,
+        quantity: quantity,
+        totalPrice: totalPrice,
+        currency: currency
+      });
 
       try {
         const productId = prod && (prod._id || prod.id) ? (prod._id || prod.id) : null;
@@ -200,8 +211,9 @@ function App() {
           id: productId,
           _id: productId,
           title: productName,
-          price: parseFloat(price),
-          quantity: quantity
+          price: unitPrice, // Цена за единицу товара
+          quantity: quantity,
+          total: parseFloat(totalPrice) // Общая цена (цена * количество)
         };
         localStorage.setItem('cart', JSON.stringify([cartItem]));
         console.log('Корзина сохранена:', cartItem);
