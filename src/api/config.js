@@ -2,39 +2,56 @@
 const getApiBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_URL;
   
+  let baseUrl = '';
+  
   if (envUrl) {
     // Если URL из переменной окружения начинается с http://, но страница загружена по HTTPS,
     // автоматически меняем на HTTPS
     if (typeof window !== 'undefined' && window.location.protocol === 'https:' && envUrl.startsWith('http://')) {
-      return envUrl.replace('http://', 'https://');
+      baseUrl = envUrl.replace('http://', 'https://');
+    } else {
+      baseUrl = envUrl;
     }
-    return envUrl;
+  } else {
+    // Для локальной разработки
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      baseUrl = 'http://localhost:3000/api';
+    } else if (typeof window !== 'undefined') {
+      // Для production используем относительный путь (работает через прокси или если API на том же домене)
+      baseUrl = '/api';
+    } else {
+      // Fallback для SSR или других случаев
+      baseUrl = 'https://derila.pro/api';
+    }
   }
   
-  // Для локальной разработки
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return 'http://localhost:3000/api';
+  // Убеждаемся, что URL заканчивается на /api
+  // Убираем завершающий слеш если есть
+  baseUrl = baseUrl.replace(/\/$/, '');
+  
+  // Если URL не заканчивается на /api, добавляем его
+  if (!baseUrl.endsWith('/api')) {
+    // Если это полный URL (начинается с http:// или https://)
+    if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+      baseUrl = `${baseUrl}/api`;
+    } else {
+      // Если это относительный путь, просто добавляем /api
+      baseUrl = `${baseUrl}/api`;
+    }
   }
   
-  // Для production используем относительный путь (работает через прокси или если API на том же домене)
-  if (typeof window !== 'undefined') {
-    // Используем относительный путь - это будет работать если API на том же домене
-    return '/api';
-  }
-  
-  // Fallback для SSR или других случаев
-  return 'https://derila.pro/api';
+  return baseUrl;
 }
 
 export const API_BASE_URL = getApiBaseUrl()
 
 export const apiClient = {
   async request(endpoint, options = {}) {
-    // Нормализуем endpoint: убираем начальный слеш если есть, добавляем если нет
+    // Нормализуем endpoint: убираем начальный слеш если есть
     let cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint
     
-    // Если API_BASE_URL уже содержит /api, а endpoint начинается с /api, убираем /api из endpoint
-    if (API_BASE_URL.endsWith('/api') && cleanEndpoint.startsWith('api/')) {
+    // Если endpoint начинается с 'api/', убираем его (так как API_BASE_URL уже содержит /api)
+    if (cleanEndpoint.startsWith('api/')) {
       cleanEndpoint = cleanEndpoint.substring(4) // Убираем 'api/'
     }
     
