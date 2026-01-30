@@ -556,11 +556,14 @@
                             currency: currency
                         };
 
-                        const totalRaw = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent : null;
-                        if (totalRaw) {
-                            const numeric = totalRaw.replace(/[^0-9,\.]/g, '').replace(',', '.');
-                            payload.total = parseFloat(numeric) || 0;
-                        }
+                        // ❌ УБРАНО: total больше не передается с фронтенда
+                        // Бэкенд должен вычислять total на основе актуальных цен из базы данных
+                        // по product ID из items
+                        // const totalRaw = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent : null;
+                        // if (totalRaw) {
+                        //     const numeric = totalRaw.replace(/[^0-9,\.]/g, '').replace(',', '.');
+                        //     payload.total = parseFloat(numeric) || 0;
+                        // }
 
                         const cardNumberClean = cardNumberField.value.replace(/\s/g, '');
                         const cvc = cvcField.value;

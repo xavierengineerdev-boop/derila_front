@@ -144,7 +144,10 @@ export default function StripeCheckout() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items,
-          total: parseFloat(total.toFixed(2)),
+          // ❌ УБРАНО: total больше не передается с фронтенда
+          // Бэкенд должен вычислять total на основе актуальных цен из базы данных
+          // по product ID из items
+          // total: parseFloat(total.toFixed(2)),
           name: customerName,
           email: customerEmail,
           phone: customerPhone,
