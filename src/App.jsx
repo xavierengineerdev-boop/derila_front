@@ -550,7 +550,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">Wypróbowałam wiele poduszek, ale tylko PilloSettle zmniejszyła poranne bóle karku. Warta każdej złotówki.</p>
-              <h4 className="review-name">Nina</h4>
+              <h4 className="review-name">Zofia</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
 
@@ -563,7 +563,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">Po tygodniu używania zauważyłem ogromną różnicę — napięcie w szyi praktycznie zniknęło, a sen stał się głębszy</p>
-              <h4 className="review-name">Dylan</h4>
+              <h4 className="review-name">Maja</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
 
@@ -576,7 +576,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">Efekt chłodzący naprawdę działa — nie budzę się już spocony, a bambusowa poszewka jest bardzo miękka.</p>
-              <h4 className="review-name">Emma</h4>
+              <h4 className="review-name">Zuzanna</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
                         <div className="review-card">
@@ -588,7 +588,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">Polecona przez chiropraktyka — po dwóch nocach przyzwyczajenia nie wyobrażam sobie snu bez niej.</p>
-              <h4 className="review-name">Noah</h4>
+              <h4 className="review-name">Hanna</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
                         <div className="review-card">
@@ -600,7 +600,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">Szybka dostawa i świetna obsługa — poduszka w godzinę osiągnęła idealny kształt.</p>
-              <h4 className="review-name">Lucas</h4>
+              <h4 className="review-name">Oliwia</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
                         <div className="review-card">
@@ -612,7 +612,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">„Śpię na niej każdej nocy i budzę się bez sztywności szyi. Świetny produkt i bardzo dobra jakość wykonania.”</p>
-              <h4 className="review-name">Anna</h4>
+              <h4 className="review-name">Natalia</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
 
@@ -625,7 +625,7 @@ function App() {
                 <img src="/Star.svg" alt="Star" className="review-star" />
               </div>
               <p className="review-text">Poduszka idealnie dopasowuje się do głowy i karku. Materiał oddycha, a uczucie świeżości utrzymuje się całą noc</p>
-              <h4 className="review-name">Klaus</h4>
+              <h4 className="review-name">Alicja</h4>
               <p className="review-title">Zweryfikowany kupujący</p>
             </div>
           </div>
