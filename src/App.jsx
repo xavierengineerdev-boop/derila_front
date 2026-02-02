@@ -446,7 +446,7 @@ function App() {
         />
         <nav className="nav">
           <a href="#" className="nav-link">Produkt</a>
-          <a href="#" className="nav-link">Cechy</a>
+          <a href="#" className="nav-link">Opis produktu</a>
           <a href="#" className="nav-link">Opinie</a>
           <a href="#" className="nav-link">FAQ</a>
         </nav>
@@ -498,7 +498,7 @@ function App() {
         </div>
         
         <div className="features-section">
-          <h2 className="features-title">Cechy</h2>
+          <h2 className="features-title">Opis produktu</h2>
           <p className="features-subtitle">Porównaj rozmiary i znajdź idealne dopasowanie.</p>
           
           <div className="features-table-container">
@@ -634,7 +634,7 @@ function App() {
         <div className="footer-showcase">
           <div className="footer-content">
             <div className="footer-info">
-              <h3 className="footer-title">Derila Ergo</h3>
+              <h3 className="footer-title">Derila – <br />ergonomiczna poduszka</h3>
               <p className="footer-subtitle">Rozmiar standardowy</p>
             </div>
             <div className="footer-pricing">
@@ -707,7 +707,7 @@ function App() {
             <h4 className="footer-links-title">Szybki dostęp</h4>
             <ul className="footer-nav">
               <li><a href="#" className="footer-link">Produkt</a></li>
-              <li><a href="#" className="footer-link">Cechy</a></li>
+              <li><a href="#" className="footer-link">Opis produktu</a></li>
               <li><a href="#" className="footer-link">Opinie</a></li>
               <li><a href="#" className="footer-link">FAQ</a></li>
             </ul>
